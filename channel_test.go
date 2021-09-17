@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -84,4 +85,20 @@ func TestBufferedChannel(t *testing.T) {
 
 	time.Sleep(4 * time.Second)
 	fmt.Println("Seuleuseai")
+}
+
+func TestRangeChannel(t *testing.T) {
+	chn := make(chan string)
+	go func() {
+		for index := 0; index < 10; index++ {
+			chn <- "send " + strconv.Itoa(index+1)
+		}
+		close(chn) // close the "channel" is a must otherwise it will block the code/deadlock
+	}()
+
+	for data := range chn {
+		fmt.Println("recieving data", data)
+	}
+
+	fmt.Println("Done donk!")
 }
