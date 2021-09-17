@@ -66,3 +66,22 @@ func TestInOutChannel(t *testing.T) {
 	close(chn)
 
 }
+
+func TestBufferedChannel(t *testing.T) {
+	chn := make(chan string, 2)
+	go func() {
+		chn <- "first input"
+		chn <- "second input"
+		chn <- "third input" // third input will blocked / send error, because there are only 2 buffer unless one is empty
+	}()
+
+	go func() {
+
+		fmt.Println("<-chn 1", <-chn)
+		fmt.Println("<-chn 2", <-chn)
+		// fmt.Println("<-chn 3", <-chn) // 3rd reciever  will blocked / send error, because there are only 2 buffer
+	}()
+
+	time.Sleep(4 * time.Second)
+	fmt.Println("Seuleuseai")
+}
