@@ -44,3 +44,25 @@ func TestChannelParameter(t *testing.T) {
 	time.Sleep(4 * time.Second)
 
 }
+
+func SendOnly(channel chan<- string) {
+	time.Sleep(2 * time.Second)
+	channel <- "[[Input only]]"
+	fmt.Println("done donk!")
+}
+func RecieveOnly(channel <-chan string) {
+	time.Sleep(2 * time.Second)
+	data := <-channel
+	fmt.Println("[[output only]]", data)
+}
+
+//  go test -v -run=TestInOutChannel
+func TestInOutChannel(t *testing.T) {
+	chn := make(chan string)
+	go SendOnly(chn)
+	go RecieveOnly(chn)
+
+	time.Sleep(3 * time.Second)
+	close(chn)
+
+}
