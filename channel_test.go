@@ -68,6 +68,7 @@ func TestInOutChannel(t *testing.T) {
 
 }
 
+//  go test -v -run=TestBufferedChannel
 func TestBufferedChannel(t *testing.T) {
 	chn := make(chan string, 2)
 	go func() {
@@ -87,6 +88,7 @@ func TestBufferedChannel(t *testing.T) {
 	fmt.Println("Seuleuseai")
 }
 
+//  go test -v -run=TestRangeChannel
 func TestRangeChannel(t *testing.T) {
 	chn := make(chan string)
 	go func() {
@@ -101,4 +103,31 @@ func TestRangeChannel(t *testing.T) {
 	}
 
 	fmt.Println("Done donk!")
+}
+
+//  go test -v -run=TestSelectChannel
+func TestSelectChannel(t *testing.T) {
+	chn1 := make(chan string)
+	chn2 := make(chan string)
+
+	defer close(chn1)
+	defer close(chn2)
+
+	go SendOnly(chn1)
+	go SendOnly(chn2)
+
+	counter := 0
+	for {
+		select {
+		case data := <-chn1:
+			fmt.Println("dari chn 1", data)
+			counter++
+		case data := <-chn2:
+			fmt.Println("dari chn 2", data)
+			counter++
+		}
+		if counter == 2 {
+			break
+		}
+	}
 }
