@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 )
@@ -130,4 +131,26 @@ func TestSelectChannel(t *testing.T) {
 			break
 		}
 	}
+}
+
+//  go test -v -run=TestMutex
+func TestMutex(T *testing.T) {
+
+	x := 0
+	var mutex sync.Mutex
+	go func() {
+		for i := 0; i < 1000; i++ {
+			go func() {
+				for j := 0; j < 10; j++ {
+					mutex.Lock() //hold until x++ run
+					x++
+					mutex.Unlock()
+
+				}
+
+			}()
+		}
+	}()
+	time.Sleep(4 * time.Second)
+	fmt.Println("ini hasil ", x)
 }
