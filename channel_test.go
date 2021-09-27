@@ -189,3 +189,5 @@ func TestChannelBlock(t *testing.T) {
 	c <- 1
 	fmt.Println("this code will", printed)
 }
+
+// buffered channel
