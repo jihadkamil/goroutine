@@ -41,9 +41,9 @@ func TestWaitCondition(t *testing.T) {
 	}()
 
 	/*
-		// will run all goroutine automatically
 		go func(){
 			time.Sleep(1 *time.Second)
+			// will run all goroutine automatically
 			cond.Broadcast()
 		}
 	*/
