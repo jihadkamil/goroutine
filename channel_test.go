@@ -154,3 +154,40 @@ func TestMutex(T *testing.T) {
 	time.Sleep(4 * time.Second)
 	fmt.Println("ini hasil ", x)
 }
+func sum(s []int, c chan int) {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	// send value sum to channel
+	c <- sum
+}
+
+//  go test -v -run= TestSumArrayChannel
+func TestSumArrayChannel(t *testing.T) {
+	s := []int{18, 72, 23, 34, 52, 16, 71, 89}
+
+	c := make(chan int)
+	go sum(s[:len(s)/2], c)
+	go sum(s[len(s)/2:], c)
+	x, y := <-c, <-c
+	fmt.Println("x", x)
+	fmt.Println("y", y)
+	fmt.Println("x+y", x+y)
+}
+
+// blocking channel
+func TestChannelBlock(t *testing.T) {
+	c := make(chan int)
+	printed := "not be printed"
+	/* func willbe blocked when data in channel not consumed by anyone
+	go func() {
+		printed = "be printed"
+		<-c
+	}()
+	// */
+	c <- 1
+	fmt.Println("this code will", printed)
+}
+
+// buffered channel
