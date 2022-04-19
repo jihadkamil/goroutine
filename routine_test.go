@@ -13,14 +13,20 @@ import (
  }
 //  */
 
-func HelloWow() {
-	fmt.Println("hello worwld")
+func HelloWow(text string) {
+	fmt.Println("hello worwld", text)
 }
 
 // /*
 func TestHelloWow(T *testing.T) {
 
-	go HelloWow()
+	go HelloWow("1")
+	go HelloWow("2")
+	go HelloWow("3")
+	go HelloWow("4")
+	go HelloWow("5")
+	go HelloWow("6")
+	go HelloWow("7")
 	fmt.Println("berhasil")
 	time.Sleep(1 * time.Second)
 }
@@ -28,11 +34,30 @@ func TestHelloWow(T *testing.T) {
 // */
 func DisplayNumber(i int) {
 	fmt.Println("display", i)
+
 }
 func TestManyGoroutine(T *testing.T) {
-	for i := 0; i < 1000; i++ {
+	for i := 0; i <= 100000; i++ {
 		// test: how light goroutine is
 		go DisplayNumber(i)
 	}
-	time.Sleep(1 * time.Second)
+	fmt.Println("done")
+	time.Sleep(5 * time.Second)
+}
+
+func TestCreateChannelLagi(t *testing.T) {
+	newChan := make(chan string)
+
+	defer close(newChan)
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		newChan <- "jihad kamil"
+		fmt.Println("channel already assigned")
+
+	}()
+
+	data := <-newChan
+	fmt.Println("nih data===>", data)
+	time.Sleep(4 * time.Second)
 }

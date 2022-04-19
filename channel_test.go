@@ -49,13 +49,13 @@ func TestChannelParameter(t *testing.T) {
 
 func SendOnly(channel chan<- string) {
 	time.Sleep(2 * time.Second)
-	channel <- "[[Input only]]"
-	fmt.Println("done donk!")
+	channel <- "[[send only]]"
+	fmt.Println("already send donk!")
 }
 func RecieveOnly(channel <-chan string) {
 	time.Sleep(2 * time.Second)
 	data := <-channel
-	fmt.Println("[[output only]]", data)
+	fmt.Println("[[recieve only]]====>", data)
 }
 
 //  go test -v -run=TestInOutChannel
@@ -85,7 +85,7 @@ func TestBufferedChannel(t *testing.T) {
 		// fmt.Println("<-chn 3", <-chn) // 3rd reciever  will blocked / send error, because there are only 2 buffer
 	}()
 
-	time.Sleep(4 * time.Second)
+	time.Sleep(2 * time.Second)
 	fmt.Println("Seuleuseai")
 }
 
@@ -118,6 +118,7 @@ func TestSelectChannel(t *testing.T) {
 	go SendOnly(chn2)
 
 	counter := 0
+	berapakali := 0
 	for {
 		select {
 		case data := <-chn1:
@@ -126,7 +127,11 @@ func TestSelectChannel(t *testing.T) {
 		case data := <-chn2:
 			fmt.Println("dari chn 2", data)
 			counter++
+		default:
+			berapakali++
+			fmt.Println("menunggu data", berapakali)
 		}
+
 		if counter == 2 {
 			break
 		}
@@ -139,7 +144,7 @@ func TestMutex(T *testing.T) {
 	x := 0
 	var mutex sync.Mutex
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < 10; i++ {
 			go func() {
 				for j := 0; j < 10; j++ {
 					mutex.Lock() //hold until x++ run
@@ -151,7 +156,7 @@ func TestMutex(T *testing.T) {
 			}()
 		}
 	}()
-	time.Sleep(4 * time.Second)
+	time.Sleep(3 * time.Second)
 	fmt.Println("ini hasil ", x)
 }
 func sum(s []int, c chan int) {
@@ -190,4 +195,55 @@ func TestChannelBlock(t *testing.T) {
 	fmt.Println("this code will", printed)
 }
 
-// buffered channel
+// race condition
+// func TestRaceCondition()
+
+type UserBalance struct {
+	sync.Mutex
+	Name    string
+	Balance int
+}
+
+func TestDeadLock(t *testing.T) {
+	userA := UserBalance{
+		Name:    "Jihad",
+		Balance: 100000,
+	}
+	userB := UserBalance{
+		Name:    "Kamil",
+		Balance: 200000,
+	}
+
+	go Transfer(&userA, &userB, 50000)
+	go Transfer(&userB, &userA, 20000)
+	time.Sleep(5 * time.Second)
+	fmt.Println("userA Name", userA.Name, "balance", userA.Balance)
+	fmt.Println("userB Name", userB.Name, "balance", userB.Balance)
+}
+
+func (user *UserBalance) Unlock() {
+	user.Mutex.Unlock()
+}
+
+func (user *UserBalance) Lock() {
+	user.Mutex.Lock()
+}
+
+func (user *UserBalance) Change(amount int) {
+	user.Balance = user.Balance + amount
+}
+
+func Transfer(user1 *UserBalance, user2 *UserBalance, amount int) {
+	user1.Lock()
+	fmt.Println("user locked", user1.Name)
+	user1.Change(-amount)
+	// latency simulation
+	time.Sleep(1 * time.Second)
+
+	user2.Lock()
+	fmt.Println("user locked", user2.Name)
+	user2.Change(amount)
+	// latency simulation
+	time.Sleep(1 * time.Second)
+
+}

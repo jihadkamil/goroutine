@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -33,17 +37,18 @@ func TestAtomic(t *testing.T) {
 func TestRaceCondition(t *testing.T) {
 	// /*
 	counterOld := 0
+
 	for i := 0; i < 100; i++ {
 		go func() {
 			for j := 0; j < 20; j++ {
-				counterOld++
+				counterOld = counterOld + 1
 				// use atomic only for primitive data structure, use Mutex for struct
 			}
 		}()
 	}
 	// */
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(4 * time.Second)
 	fmt.Println("counter Race condition", counterOld)
 }
 
@@ -74,9 +79,9 @@ type BankAccount struct {
 }
 
 func (acc *BankAccount) GetBalance() int {
-	// acc.RWMutex.RLock()
+	acc.RWMutex.RLock()
 	balance := acc.Balance
-	// acc.RWMutex.RUnlock()
+	acc.RWMutex.RUnlock()
 	return balance
 
 }
@@ -101,4 +106,20 @@ func TestRWMutex(T *testing.T) {
 
 	}
 	time.Sleep(4 * time.Second)
+}
+
+func TestSR(T *testing.T) {
+	response, err := http.Get("http://pokeapi.co/api/v2/pokedex/kanto/")
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(responseData))
+
 }

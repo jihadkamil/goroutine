@@ -1,11 +1,20 @@
 package main
 
+import "fmt"
+
+func RunRed() {
+	fmt.Println("red")
+}
+
+/*
+
 import (
 	"fmt"
 	"runtime"
 	"sync"
 	"time"
 )
+
 
 func main() {
 
@@ -32,3 +41,4 @@ func main() {
 	group.Wait()
 
 }
+// */
