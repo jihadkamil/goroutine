@@ -20,7 +20,7 @@ func TestWaitGroup(T *testing.T) {
 	group := &sync.WaitGroup{}
 
 	for i := 0; i < 10; i++ {
-		fmt.Println("index", i)
+		// fmt.Println("index", i)
 		go RunAsynchronous(group, i)
 	}
 	// using group wait wil wait goroutine finish the process

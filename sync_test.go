@@ -6,16 +6,17 @@ import (
 	"testing"
 )
 
-var index = 0
+var counter = 0
 
 func OnlyOnce() {
-	index++
+	fmt.Println("counter", counter)
+	counter++
 }
 
 //  go test -v -run=TestWaitGroup
 func TestSyncOnce(T *testing.T) {
-	group := &sync.WaitGroup{}
-	once := &sync.Once{}
+	group := sync.WaitGroup{}
+	once := sync.Once{}
 
 	for i := 0; i < 30; i++ {
 		// go RunAsynchronous(group, i)
@@ -29,7 +30,7 @@ func TestSyncOnce(T *testing.T) {
 	}
 	// using group wait wil wait goroutine finish the process
 	group.Wait()
-	fmt.Println("[[[[[[[[[[[complete]]]]]]]", index)
+	fmt.Println("[[[[[[[[[[[complete]]]]]]]", counter)
 }
 
 var addToData = func(dt *sync.Map, val, key int, group *sync.WaitGroup) {
